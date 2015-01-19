@@ -81,34 +81,32 @@ print(q)
 
 ## Imputing missing values
 
-Calculate the total number of missing values.
-
-```{r, results='asis'}
-dt <- dt[, isStepsMissing := is.na(steps)]
-tab <- dt[, .N, isStepsMissing]
-print(xtable(tab), type="html", include.rownames=FALSE)
-```
-
-Use k-Nearest Neighbour Imputation.
-I couldn't get Iterative robust model-based imputation (IRMI) to work; try again later.
+1. Calculated missing
 
 ```{r}
-dt <- kNN(dt)
-# dt <- irmi(dt)
+table(is.na(activity$steps))
 ```
 
-Verify that there are no missing values for `steps` after imputation.
+2. Filling in all dataset
 
-```{r, results='asis'}
-tab <- dt[, .N, list(isMissing = is.na(steps))]
-print(xtable(tab), type="html", include.rownames=FALSE)
-```
+Use the mean of interval, to replace the missing values.
 
 ```{r}
-dtMissingness <- dt[, list(countMissing = sum(isStepsMissing), countRecords = .N, propMissing = sum(isStepsMissing / .N)), date]
-dtMissingness[countMissing > 0]
+mfixed<-activity
+mfixed[is.na(mfixed[, 1]), 1]<-average_steps[is.na(mfixed[, 1]),2]
 ```
 
+Create a histogram of the new dataset, which has the NAs replaced with the 5-minute means.
+
+```{r}
+qplot(date, weight=mfixed$steps, data=mfixed, geom="histogram")
+```
+
+Calculate and report the mean and media values. We can see that the values differ from the initial calculation, and have higher value. It is also observed in the graph above. Most days have an increased number of mean of steps, since the NAs have been replaced by the 5-minute interval mean.
+
+```{r}
+mean(tapply(mfixed$steps, mfixed$date, sum, na.rm = TRUE))
+median(tapply(mfixed$steps, mfixed$date, sum, na.rm = TRUE))
 
 
 ## Are there differences in activity patterns between weekdays and weekends?
