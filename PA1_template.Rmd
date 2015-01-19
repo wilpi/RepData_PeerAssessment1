@@ -117,7 +117,8 @@ mfixed$day<-as.factor(ifelse(weekdays(mfixed$date) %in% c("Saturday","Sunday"),"
 ```
 Plot the 5-minute average of steps, by weekday/weekend.
 ```{r}
-xyplot(steps ~ interval | day, aggregate(steps ~ interval + day, mfixed, FUN = mean), layout = c(1, 2), type = "l", group=day)
+xyplot(steps ~ interval | day, aggregate(steps ~ interval + day, mfixed, FUN = mean), 
+layout = c(1, 2), type = "l", group=day)
 ```
 
 
