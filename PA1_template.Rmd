@@ -65,7 +65,8 @@ summary(m)
 Aggregate the average number of steps taken by 5-minute interval.
 
 ```{r}
-average_steps<-data.frame(cbind(activity$interval,tapply(activity$steps, activity$interval, mean, na.rm = TRUE)))
+average_steps<-data.frame(cbind(activity$interval,
+tapply(activity$steps, activity$interval, mean, na.rm = TRUE)))
 colnames(average_steps) <- c("interval","steps")
 
 ```
