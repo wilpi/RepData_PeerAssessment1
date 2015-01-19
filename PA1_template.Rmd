@@ -1,62 +1,32 @@
 # Reproducible Research: Peer Assessment 1
 
 
-## Loading and preprocessing the data
+## Loading and preprocesing data
+
+### Loading
 
 ```{r}
 packages <- c("data.table", "ggplot2", "xtable", "VIM")
 sapply(packages, require, character.only=TRUE, quietly=TRUE)
+fileUrl <- "https://d396qusza40orc.cloudfront.net/repdata%2Fdata%2Factivity.zip"
+download.file(fileUrl, destfile = "Dataset.zip", method = "curl")
+unzip("Dataset.zip")
+activity <- read.csv("./activity.csv")
 ```
 
-> Show any code that is needed to
->
-> 1. Load the data (i.e. `read.csv()`)
->
-> 2. Process/transform the data (if necessary) into a format suitable for your analysis
-
-Unzip the data file.
+### Process  the data
 
 ```{r}
-executable <- file.path("C:", "Program Files (x86)", "7-Zip", "7z.exe")
-parameters <- "x"
-f <- file.path(getwd(), "activity.zip")
-switch <- "-aoa"
-cmd <- paste(paste0("\"", executable, "\""), parameters, paste0("\"", f, "\""), switch)
-cmd
-system(cmd)
+activity$date <- as.Date(activity$date)
+length(activity$steps)
+summary(activity)
+
 ```
-
-Read the CSV file.
-Convert the data frame to a data table using the [`data.table`]
-
-
-```{r}
-dt <- read.csv(file.path(getwd(), "activity.csv"))
-dt <- data.table(dt)
-```
- 
-Verify that the number of rows in the dataset is the expected value of 17,568.
-
-```{r}
-check <- nrow(dt) == 17568
-if (check == FALSE) stop("The number of rows in the dataset is not 17,568.")
-```
-
-Convert the `date` variable to a date class.
-And look at the structure of the dataset.
-
-```{r}
-dt <- dt[, date := as.Date(date)]
-setkey(dt, date, interval)
-str(dt)
-dt
-```
-
 
 
 ## What is mean total number of steps taken per day?
 
-> For this part of the assignment, you can ignore the missing values in
+> For this part ignore the missing values in
 > the dataset.
 >
 > 1. Make a histogram of the total number of steps taken each day
@@ -67,34 +37,26 @@ Aggregate the number of steps taken each day.
 Days with missing values (`NA`) will have `NA` when aggregated.
 
 ```{r}
-dtDaily <- dt[, list(sumSteps = sum(steps)), date]
-head(dtDaily)
+m<-tapply(activity$steps, activity$date,sum)
+edit(head(m))
+
 ```
 
-Plot a histogram of the total number of steps taken each day.
+Plot a histogram of the total number of steps taken each day. (for understand variability between days)
 
-```{r histogramStepsTakenEachDay}
-ggplot(dtDaily, aes(x=sumSteps)) +
-geom_histogram(alpha=1/2, binwidth=1000)
+```{r }
+hist(m)
 ```
 
 Calculate the mean and median total number of steps taken per day **before imputing**.
 
 ```{r, results='asis'}
-tab <- dtDaily[, list(n = .N, nValid = sum(!is.na(sumSteps)), mean = mean(sumSteps, na.rm=TRUE), median = median(sumSteps, na.rm=TRUE))]
-print(xtable(tab), type="html", include.rownames=FALSE)
+summary(m)
 ```
 
-Copy the data table `dtDaily` before imputation to be used later.
-
-```{r}
-dtDaily <- dtDaily[, status := "Before imputation"]
-dtDailyBeforeImputation <- dtDaily
-```
 
 
 ## What is the average daily activity pattern?
-
 
 > 1. Make a time series plot (i.e. `type = "l"`) of the 5-minute interval (x-axis) and the average number of steps taken, averaged across all days (y-axis)
 >
@@ -103,14 +65,17 @@ dtDailyBeforeImputation <- dtDaily
 Aggregate the average number of steps taken by 5-minute interval.
 
 ```{r}
-dtIntervals <- dt[, list(meanSteps = mean(steps, na.rm=TRUE)), interval]
+average_steps<-data.frame(cbind(activity$interval,tapply(activity$steps, activity$interval, mean, na.rm = TRUE)))
+colnames(average_steps) <- c("interval","steps")
+
 ```
 
 Plot a time series of the 5-minute interval and the average number of steps taken across all days.
 
 ```{r timeseriesStepsTakenEachInterval}
-ggplot(dtIntervals, aes(x=interval, y=meanSteps)) +
-geom_line()
+q<-ggplot(data=average_steps,aes(x=interval,y=steps)) +
+  geom_line()
+print(q)
 ```
 
 
