@@ -15,23 +15,6 @@ sapply(packages, require, character.only=TRUE, quietly=TRUE)
 ```
 
 ```
-## data.table 1.9.4  For help type: ?data.table
-## *** NB: by=.EACHI is now explicit. See README to restore previous behaviour.
-## VIM is ready to use. 
-##  Since version 4.0.0 the GUI is in its own package VIMGUI.
-## 
-##           Please use the package to use the new (and old) GUI.
-## 
-## Suggestions and bug-reports can be submitted at: https://github.com/alexkowa/VIM/issues
-## 
-## Attaching package: 'VIM'
-## 
-## The following object is masked from 'package:datasets':
-## 
-##     sleep
-```
-
-```
 ## data.table    ggplot2     xtable        VIM 
 ##       TRUE       TRUE       TRUE       TRUE
 ```
